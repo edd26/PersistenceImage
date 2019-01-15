@@ -1,0 +1,10 @@
+language: julia
+
+julia:
+  - nightly
+  - 1.0
+
+notifications:
+  email: false
+
+coveralls: true
