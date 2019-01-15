@@ -1,5 +1,7 @@
 PersistenceImage
 ===
+[![Build Status](https://travis-ci.org/chronchi/PersistenceImage.jl.svg?branch=master)](https://travis-ci.org/chronchi/PersistenceImage.jl) [![Coverage Status](https://coveralls.io/repos/github/chronchi/PersistenceImage.jl/badge.svg?branch=master)](https://coveralls.io/github/chronchi/PersistenceImage.jl?branch=master)
+
 
 Package that provides an implementation to the persistence algorithm proposed in https://dl.acm.org/citation.cfm?id=3122017.
 
