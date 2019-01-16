@@ -10,7 +10,7 @@ include("auxiliaryfunctions.jl")
 """
     transformdiagram(diagram; pixels, σ)
 
-Returns the persistence image of a persistence diagram, given the
+Return the persistence image of a persistence diagram, given the
 persistence diagram, pixels and standard deviation.
 """
 function transformdiagram(diagram::Array{Float64, 2};
@@ -45,7 +45,7 @@ function transformdiagram(diagram::Array{Float64, 2};
                 xpdf = pdf(dB, xcenter)
                 ypdf = pdf(dP, ycenter)
                 # sum to the corresponding pixel
-                img[k,j] += weights * xpdf * xpdf
+                img[size(img,1)+1-k,j] += weights * xpdf * xpdf
             end
         end
     end

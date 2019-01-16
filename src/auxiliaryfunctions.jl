@@ -3,7 +3,7 @@
 """
     transformdiagram(diagram)
 
-Returns the given persistence diagram to landscape
+Return the given persistence diagram to landscape.
 """
 function tolandscape(diagram::Array{Float64, 2})
     newdiagram = copy(diagram)
@@ -14,7 +14,7 @@ end
 """
     weighting(x, y)
 
-Returns the weight of a point in the persistence landscape
+Return the weight of a point in the persistence landscape.
 """
 function weighting(x, y)
     if y <= 0
