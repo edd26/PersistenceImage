@@ -45,7 +45,7 @@ function transformdiagram(diagram::Array{Float64, 2};
                 xpdf = pdf(dB, xcenter)
                 ypdf = pdf(dP, ycenter)
                 # sum to the corresponding pixel
-                img[size(img,1)+1-k,j] += weights * xpdf * xpdf
+                img[size(img,1)+1-k,j] += weights * xpdf * ypdf
             end
         end
     end
