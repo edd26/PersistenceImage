@@ -10,7 +10,7 @@ In order to install the package follow the steps below
 
 ```julia
 using Pkg
-Pkg.add("https://github.com/chronchi/PersistenceImage.jl")
+Pkg.add(url="https://github.com/chronchi/PersistenceImage.jl")
 ```
 
 # Usage
