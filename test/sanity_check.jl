@@ -1,9 +1,13 @@
 using Plots
 
+using Distributions
 include("../src/PersistenceImage.jl")
+include("../src/auxiliaryfunctions.jl")
+# include("auxiliaryfunctions.jl")
 import .PersistenceImage: transformdiagram as transformdiagram
 import .PersistenceImage: transformdiagram2 as transformdiagram2
-# import .PersistenceImage: toalndscape2 as toalndscape2
+import .PersistenceImage: toalndscape2 as toalndscape2
+import .PersistenceImage: toalndscape as toalndscape
 
 barcodes1 = [
     0.1 0.2 # early born, short lived
