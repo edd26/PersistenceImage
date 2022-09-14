@@ -1,20 +1,23 @@
 using Plots
 
 using Distributions
-include("../src/PersistenceImage.jl")
-include("../src/auxiliaryfunctions.jl")
-# include("auxiliaryfunctions.jl")
-import .PersistenceImage: transformdiagram as transformdiagram
+using PersistenceImage
+
+# include("src/PersistenceImage.jl")
+# include("src/auxiliaryfunctions.jl")
+# # include("auxiliaryfunctions.jl")
+# import .PersistenceImage: transformdiagram as transformdiagram
 import .PersistenceImage: transformdiagram2 as transformdiagram2
 import .PersistenceImage: toalndscape2 as toalndscape2
-import .PersistenceImage: toalndscape as toalndscape
+# import .PersistenceImage: toalndscape as toalndscape
 
 barcodes1 = [
     0.1 0.2 # early born, short lived
     0.1 0.9 # early born, long lived
     0.5 0.6 # mid born, short lived
     0.8 0.9 # alte born, short lived
-] # triangle-like shape 
+] # triangle-like shape
+##
 
 
 function plot_bd_diagram(barcodes::Vector; dims=1:size(barcodes, 2),
@@ -59,7 +62,7 @@ function plot_bd_diagram(barcodes::Vector; dims=1:size(barcodes, 2),
     return plot_ref
 end
 
-function get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+function get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
     reformatted_barcodes = [vcat([hcat([barcodes1[k, 1], barcodes1[k, 2]]...) for k in 1:size(barcodes1, 1)]...)]
     bd_diagram = plot_bd_diagram(reformatted_barcodes)
     xticks!(0:0.1:1)
@@ -73,10 +76,10 @@ function get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
         pixels=grid_size,
         σ=σ,
         birth_range=birth_range,
-        death_range=death_range,
+        persistence_range=persistence_range,
     )
 
-    # ===- 
+    # ===-
     heatmapargs = (aspectratio=1, cbar=:outerbottom)
     wid = 600
     hei = 500
@@ -96,8 +99,11 @@ function get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
         plot_title="σ=$(σ), grid_size=($(grid_size[1]),$(grid_size[2]))"
     )
 end
+##
 
-@testset "Transformation arguments set nr 1" begin
+begin
+    "Transformation arguments set nr 1"
+    ##
     grid_size = (100, 100)
     σ = 0.04 # standard deviation
     min_death = 0.0
@@ -105,9 +111,9 @@ end
     min_birth = 0.0
     max_birth = 1.0
     birth_range = (min_birth, max_birth)
-    death_range = (min_death, max_death)
+    persistence_range = (min_death, max_death)
 
-    pl1 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+    pl1 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
 
     # ===-
     grid_size = (100, 100)
@@ -117,9 +123,9 @@ end
     min_birth = 0.0
     max_birth = 1.0
     birth_range = (min_birth, max_birth)
-    death_range = (min_death, max_death)
+    persistence_range = (min_death, max_death)
 
-    pl2 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+    pl2 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
     # ===-
     grid_size = (1000, 1000)
     σ = 0.02 # standard deviation
@@ -128,9 +134,9 @@ end
     min_birth = 0.0
     max_birth = 1.0
     birth_range = (min_birth, max_birth)
-    death_range = (min_death, max_death)
+    persistence_range = (min_death, max_death)
 
-    pl3 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+    pl3 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
 
     # ===-
     grid_size = (100, 100)
@@ -140,9 +146,9 @@ end
     min_birth = 0.0
     max_birth = 1.0
     birth_range = (min_birth, max_birth)
-    death_range = (min_death, max_death)
+    persistence_range = (min_death, max_death)
 
-    pl4 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+    pl4 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
 
     # ===-
     grid_size = (10, 10)
@@ -152,9 +158,9 @@ end
     min_birth = 0.0
     max_birth = 1.0
     birth_range = (min_birth, max_birth)
-    death_range = (min_death, max_death)
+    persistence_range = (min_death, max_death)
 
-    pl5 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, death_range)
+    pl5 = get_comparison_plt(barcodes1, grid_size, σ, birth_range, persistence_range)
 
     wid = 600
     hei = 500
@@ -165,5 +171,31 @@ end
         layout=(tot, 1),
         size=(5 * wid, tot * hei)
     )
+    ##
     savefig(final_comparison_plt, "results_comparison.png")
+end
+
+##
+begin
+    "Performence test"
+    using BenchmarkTools
+    ##
+    function get_pers_image(a)
+        diagram = [a a .^ (2 / 3)]
+
+        return transformdiagram(diagram)
+    end
+
+    @benchmark get_pers_image(data) setup = (data = rand(1000))
+    ##
+
+    function get_pers_image2(a)
+        diagram = [a a .^ (2 / 3)]
+
+        return transformdiagram2(diagram)
+    end
+
+    @benchmark get_pers_image2(data) setup = (data = rand(1000))
+
+    ##
 end
