@@ -2,6 +2,7 @@ module PersistenceImage
 
 
 export transformdiagram, tolandscape, weighting
+export transformdiagram2
 
 using Distributions
 
