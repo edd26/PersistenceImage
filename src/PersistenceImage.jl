@@ -26,7 +26,7 @@ function transformdiagram(diagram::Array{Float64,2}; pixels::Tuple{Int64,Int64}=
     xaxis = range(xmin, stop=xmax, length=pixels[1] + 1)
     yaxis = range(ymin, stop=ymax, length=pixels[2] + 1)
 
-    img = Array{Float64}(undef, pixels[1], pixels[2])
+    # img = Array{Float64}(undef, pixels[1], pixels[2])
     img = zeros(pixels[1], pixels[2])
 
     for i in 1:size(landscape, 1)
@@ -56,32 +56,35 @@ end
     transformdiagram2(diagram; pixels, σ, birth_range, death_range)
 """
 function transformdiagram2(diagram::Array{Float64,2}; pixels::Tuple{Int64,Int64}=(10, 10), σ::Float64=1.0,
-    birth_range::Tuple{Float64,Float64}=(min(diagram[:, 1]...), max(diagram[:, 1]...)),
-    persistence_range::Tuple{Float64,Float64}=(min(diagram[:, 2]...), max(diagram[:, 2]...))
+    birth_range::Tuple{Float64,Float64}=(min(0,diagram[:, 1]...), max(diagram[:, 1]...)),
+    persistence_range::Tuple{Float64,Float64}=(min(0,diagram[:, 2]...), max(diagram[:, 2]...))
 )
     landscape = tolandscape(diagram)
+    total_points = size(landscape, 1)
+    max_persistence = maximum(landscape[:,2])[1]
+
     # create a grid over our landscape
     x_start = birth_range[1]
     x_end = birth_range[end]
     y_start = persistence_range[1]
     y_end = persistence_range[end]
 
-    xaxis = range(x_start, x_end, length=pixels[1])
-    yaxis = range(y_start, y_end, length=pixels[1])
-    img = zeros(Float64, pixels[1], pixels[2])
-    max_persistence = findmax(landscape[:,2])[1]
+    xaxis = range(x_start, x_end, length=pixels[1]+1)
+    yaxis = range(y_start, y_end, length=pixels[2]+1)
 
-    for i in 1:size(landscape, 1)
+    xcentres = [mean([xaxis[k], xaxis[k+1]]) for k in 1:pixels[1]]
+    ycentres = [mean([yaxis[k], yaxis[k+1]]) for k in 1:pixels[1]]
+
+    img = zeros(Float64, pixels[1], pixels[2])
+    for i in 1:total_points
         birth = landscape[i, 1]
         persistence = landscape[i, 2]
         weights = weighting(birth, max_persistence)
 
-        dB = Normal(birth, σ)
-        dP = Normal(persistence, σ)
-        # get a vector of x values
-        x_vals = [Distributions.pdf(dB, x) for x in xaxis]
-        y_vals = [Distributions.pdf(dP, y) for y in yaxis]
-        img_slice = (y_vals*(x_vals')*weights)[end:-1:1, :]
+        xpdf(x) = Distributions.pdf(Normal(birth, σ), x)
+        ypdf(y) = Distributions.pdf(Normal(persistence, σ), y)
+
+        img_slice = (ypdf.(ycentres)*(xpdf.(xcentres)')*weights)[end:-1:1, :]
         img .+= img_slice
     end
 
