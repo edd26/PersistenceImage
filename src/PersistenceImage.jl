@@ -57,12 +57,15 @@ end
     transformdiagram2(diagram; pixels, σ, birth_range, death_range)
 """
 function transformdiagram2(diagram::Array{Float64,2}; pixels::Tuple{Int64,Int64}=(10, 10), σ::Float64=1.0,
-    birth_range::Tuple{Float64,Float64}=(min(0,diagram[:, 1]...), max(diagram[:, 1]...)),
-    persistence_range::Tuple{Float64,Float64}=(min(0,diagram[:, 2]...), max(diagram[:, 2]...))
+    birth_range::Tuple{Float64,Float64}=(min(0, diagram[:, 1]...), max(diagram[:, 1]...)),
+    persistence_range::Tuple{Float64,Float64}=(min(0, diagram[:, 2]...), max(diagram[:, 2]...)),
+    weight_with_maxp::Bool=false
 )
     landscape = tolandscape(diagram)
     total_points = size(landscape, 1)
-    max_persistence = maximum(landscape[:,2])[1]
+    if weight_with_maxp
+        max_persistence = maximum(landscape[:, 2])[1]
+    end
 
     # create a grid over our landscape
     x_start = birth_range[1]
@@ -70,8 +73,8 @@ function transformdiagram2(diagram::Array{Float64,2}; pixels::Tuple{Int64,Int64}
     y_start = persistence_range[1]
     y_end = persistence_range[end]
 
-    xaxis = range(x_start, x_end, length=pixels[1]+1)
-    yaxis = range(y_start, y_end, length=pixels[2]+1)
+    xaxis = range(x_start, x_end, length=pixels[1] + 1)
+    yaxis = range(y_start, y_end, length=pixels[2] + 1)
 
     xcentres = [mean([xaxis[k], xaxis[k+1]]) for k in 1:pixels[1]]
     ycentres = [mean([yaxis[k], yaxis[k+1]]) for k in 1:pixels[1]]
@@ -80,7 +83,12 @@ function transformdiagram2(diagram::Array{Float64,2}; pixels::Tuple{Int64,Int64}
     for i in 1:total_points
         birth = landscape[i, 1]
         persistence = landscape[i, 2]
-        weights = weighting(birth, max_persistence)
+
+        if weight_with_maxp
+            weights = weighting(birth, max_persistence)
+        else
+            weights = weighting(birth, persistence) # Change this to maxiaml persistence for all data, not local persistence of current point
+        end
 
         xpdf(x) = Distributions.pdf(Normal(birth, σ), x)
         ypdf(y) = Distributions.pdf(Normal(persistence, σ), y)
